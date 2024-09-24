@@ -19,8 +19,8 @@ class Student:
         )
         db_manager.conn.commit()
 
-    @classmethod
-    def get_all_students(cls, db_manager: Datamanager):
+    @staticmethod
+    def get_all_students(db_manager: Datamanager):
         cursor = db_manager.conn.cursor()
         cursor.execute("SELECT id, first_name, last_name, email, date_of_birth, date_of_enroll FROM students")
         result = cursor.fetchall()
@@ -38,34 +38,36 @@ class Student:
             )
         return students
 
-    def _str_(self):
+    def __str__(self):
         return f"Student: {self.first_name} {self.last_name} (Email: {self.email})"
-    def update_grade(self, db_manager: Datamanager, assignment_id, grade):
+    @staticmethod
+    def update_grade(db_manager: Datamanager, grade,student_id,assignment_id):
         cursor = db_manager.conn.cursor()
         cursor.execute(
             """UPDATE grades
             SET grade = ?
             WHERE student_id = ? AND assignment_id = ?""",
-            (grade, self.id, assignment_id),
+            (grade,student_id,assignment_id),
         )
         db_manager.conn.commit()
-    def delete_from_db(self, db_manager: Datamanager):
+    @staticmethod
+    def delete_from_db(db_manager: Datamanager,student_id):
         cursor = db_manager.conn.cursor()
         
         cursor.execute(
             """DELETE FROM grades
             WHERE student_id = ?""",
-            (self.id,),
+            (student_id,),
         )
         
         cursor.execute(
             """DELETE FROM students
             WHERE id = ?""",
-            (self.id,),
+            (student_id,),
         )
         db_manager.conn.commit()
-    @classmethod
-    def search_students_by_dob(cls, db_manager: Datamanager, start_date: str, end_date: str):
+    @staticmethod
+    def search_students_by_dob(db_manager: Datamanager, start_date: str, end_date: str):
         cursor = db_manager.conn.cursor()
         cursor.execute(
             """SELECT id, first_name, last_name, email, date_of_enroll

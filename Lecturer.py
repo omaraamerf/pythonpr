@@ -1,6 +1,6 @@
 from Datamanager import Datamanager
 class Lecturer:
-    def _init_(self, first_name, last_name, email, hire_date, department, lecturer_id=None):
+    def __init__(self, first_name, last_name, email, hire_date, department, lecturer_id=None):
         self.id = lecturer_id
         self.first_name = first_name
         self.last_name = last_name
@@ -8,7 +8,7 @@ class Lecturer:
         self.hire_date = hire_date
         self.department = department
 
-    def save_to_db2(self, db_manager: Datamanager):
+    def save_to_db_lec(self, db_manager: Datamanager):
         cursor = db_manager.conn.cursor()
         cursor.execute(
             """INSERT INTO lecturers (first_name, last_name, email, hire_date, department)
@@ -17,8 +17,8 @@ class Lecturer:
         )
         db_manager.conn.commit()
 
-    @classmethod
-    def get_all_lecturers(cls, db_manager: Datamanager):
+    @staticmethod
+    def get_all_lecturers(db_manager: Datamanager):
         cursor = db_manager.conn.cursor()
         cursor.execute("SELECT id, first_name, last_name, email, hire_date, department FROM lecturers")
         result = cursor.fetchall()
@@ -36,10 +36,10 @@ class Lecturer:
             )
         return lecturers
 
-    def _str_(self):
-        return f"Lecturer: {self.first_name} {self.last_name} (Email: {self.email}, Department: {self.department})"
-    @classmethod
-    def search_lecturers(cls, db_manager: Datamanager, search_query: str):
+    def __str__(self):
+        return f"Lecturer: {self.first_name} {self.last_name}, (Email: {self.email}, Department: {self.department})"
+    @staticmethod
+    def search_lecturers(db_manager: Datamanager, search_query: str):
         cursor = db_manager.conn.cursor()
         cursor.execute(
             """SELECT id, first_name, last_name, email, hire_date, department
