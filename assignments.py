@@ -1,6 +1,7 @@
 from Datamanager import Datamanager
+from Student import Student
 class Assignment:
-    def _init_(self, name, description, lecturer_id, assignment_id=None):
+    def __init__(self, name, description, lecturer_id, assignment_id=None):
         self.id = assignment_id
         self.name = name
         self.description = description
@@ -15,8 +16,8 @@ class Assignment:
         )
         db_manager.conn.commit()
 
-    @classmethod
-    def get_all_assignments(cls, db_manager: Datamanager):
+    @staticmethod
+    def get_all_assignments(db_manager: Datamanager):
         cursor = db_manager.conn.cursor()
         cursor.execute("SELECT id, name, description, lecturer_id FROM assignments")
         result = cursor.fetchall()
@@ -32,10 +33,10 @@ class Assignment:
             )
         return assignments
 
-    def _str_(self):
-        return f"Assignment: {self.name} - {self.description} (Lecturer ID: {self.lecturer_id})"
-    @classmethod
-    def get_assignments_by_lecturer(cls, db_manager: Datamanager, lecturer_id: int):
+    def __str__(self):
+        return f"Assignment: {self.name}, description: {self.description}, Lecturer ID: {self.lecturer_id}"
+    @staticmethod
+    def get_assignments_by_lecturer( db_manager: Datamanager, lecturer_id: int):
         cursor = db_manager.conn.cursor()
         cursor.execute(
             """SELECT id, name, description, lecturer_id 
@@ -55,17 +56,18 @@ class Assignment:
             )
         )
         return assignments
-    @classmethod
-    def add_assignment(cls, db_manager: Datamanager, assignment_name: str):
+    @staticmethod
+    def add_assignment(db_manager: Datamanager, assignment_name: str,lecturer_id: int):
         cursor = db_manager.conn.cursor()
         cursor.execute(
-            """INSERT INTO assignments (name) VALUES (?)""",
-            (assignment_name,),
+            """INSERT INTO assignments (name, lecturer_id) VALUES (?, ?)""",
+            (assignment_name, lecturer_id),
         )
         assignment_id = cursor.lastrowid
         db_manager.conn.commit()
 
-        students = cls.get_all_students(db_manager)
+        # Add default grades for all students
+        students = Student.get_all_students(db_manager)
         for student in students:
             cursor.execute(
                 """INSERT INTO grades (student_id, assignment_id, grade) VALUES (?, ?, 0)""",
